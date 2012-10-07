@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from django_orm.core.sql import SqlExpression
+from djorm_expressions.base import SqlExpression
 from . import functions
 
 class SimpleExpression(SqlExpression):
@@ -58,7 +58,7 @@ class GeoExpression(object):
 
     def is_vertical(self):
         return SimpleExpression(self.field, "?|")
-    
+
     def is_vertical_aligned(self):
         return SqlExpression(self.field, "?|", value)
 

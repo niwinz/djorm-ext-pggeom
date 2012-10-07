@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from django_orm.core.sql import SqlFunction
+from djorm_expressions.base import SqlFunction
 
 class Distance(SqlFunction):
     sql_template = '(%(field)s <-> %%s)'

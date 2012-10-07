@@ -169,6 +169,9 @@ class Point(object):
     def __repr__(self):
         return "<Point({0},{1})>".format(self.x, self.y)
 
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
+
     @classmethod
     def from_tuple(cls, data):
         if len(data) != 2:
@@ -182,7 +185,7 @@ class Circle(object):
     def __init__(self, point, radius):
         super(Circle, self).__init__()
         assert isinstance(point, (list, tuple, Point)), "point must be a list or Point instance"
-        assert isinstance(radius, (int, long, float)), "radis must be int or float"
+        assert isinstance(radius, (int, long, float)), "radius must be int or float"
 
         if isinstance(point, (list, tuple)):
             if len(point) != 2:
@@ -192,7 +195,7 @@ class Circle(object):
         else:
             self.point = point
 
-        self.r = radis
+        self.r = radius
 
     def __repr__(self):
         return "<Circle({0},{1})>".format(self.point, self.r)
@@ -200,6 +203,9 @@ class Circle(object):
     def __iter__(self):
         yield self.point
         yield self.r
+
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
 
     @classmethod
     def from_tuple(cls, data):
@@ -240,6 +246,9 @@ class Lseg(object):
         yield self.start_point
         yield self.end_point
 
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
+
     @classmethod
     def from_tuple(cls, data):
         if len(data) == 4:
@@ -276,6 +285,9 @@ class Box(object):
         yield self.start_point
         yield self.end_point
 
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
+
     @classmethod
     def from_tuple(cls, data):
         if len(data) == 4:
@@ -290,10 +302,10 @@ class Path(object):
 
     closed = False
 
-    def __init__(self, *args, closed=True):
+    def __init__(self, *args, **kwargs):
         super(Path, self).__init__()
         self.points = []
-        self.closed = closed
+        self.closed = kwargs.pop('closed', True)
 
         if len(args) < 1:
             raise ValueError("Incorrect parameters")
@@ -313,6 +325,9 @@ class Path(object):
     def __iter__(self):
         for item in self.points:
             yield item
+
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
 
     @classmethod
     def from_tuple(self, data):
