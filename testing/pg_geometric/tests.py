@@ -24,48 +24,48 @@ class GeometricSearches(TestCase):
 
         # simple sql expresion.
         qs = SomeObject.objects.where(
-            SqlExpression("pos", "<@", Box(1,1,4,4))
+            SqlExpression("pos", "<@", Box([1,1],[4,4]))
         )
         self.assertEqual(qs.count(), 3)
 
         # builtin helper
         qs = SomeObject.objects.where(
-            GeoExpression("pos").contained_on(Box(1,1,4,4))
+            GeoExpression("pos").contained_on(Box([1,1],[4,4]))
         )
         self.assertEqual(qs.count(), 3)
 
     def test_simple_overlap(self):
         BoxObjectModel.objects.bulk_create([
-            BoxObjectModel(barea=Box(1,1,3,2)),
-            BoxObjectModel(barea=Box(2,2,4,7)),
-            BoxObjectModel(barea=Box(10,10,20,20)),
-            BoxObjectModel(barea=Box(-1,-4, -5, -2)),
+            BoxObjectModel(barea=Box([1,1],[3,2])),
+            BoxObjectModel(barea=Box([2,2],[4,7])),
+            BoxObjectModel(barea=Box([10,10],[20,20])),
+            BoxObjectModel(barea=Box([-1,-4], [-5, -2])),
         ])
 
         # simple sql expression
         qs = BoxObjectModel.objects.where(
-            SqlExpression("barea", "&&", Box(2,0,5,3))
+            SqlExpression("barea", "&&", Box([2,0],[5,3]))
         )
         self.assertEqual(qs.count(), 2)
 
         # builtin helper
         qs = BoxObjectModel.objects.where(
-            GeoExpression("barea").overlaps(Box(2,0,5,3))
+            GeoExpression("barea").overlaps(Box([2,0],[5,3]))
         )
         self.assertEqual(qs.count(), 2)
 
     def test_join_overlap_circle(self):
-        c_instance_0 = CircleObjectModel.objects.create(carea=Circle(1,1,5))
-        c_instance_1 = CircleObjectModel.objects.create(carea=Circle(-2, -2, 1))
+        c_instance_0 = CircleObjectModel.objects.create(carea=Circle([1,1],5))
+        c_instance_1 = CircleObjectModel.objects.create(carea=Circle([-2, -2], 1))
 
         BoxObjectModel.objects.bulk_create([
-            BoxObjectModel(barea=Box(1,1,3,2), other=c_instance_0),
-            BoxObjectModel(barea=Box(2,2,4,7), other=c_instance_0),
-            BoxObjectModel(barea=Box(10,10,20,20), other=c_instance_1)
+            BoxObjectModel(barea=Box([1,1],[3,2]), other=c_instance_0),
+            BoxObjectModel(barea=Box([2,2],[4,7]), other=c_instance_0),
+            BoxObjectModel(barea=Box([10,10],[20,20]), other=c_instance_1)
         ])
 
         qs = BoxObjectModel.objects.where(
-            SqlExpression("other__carea", "&&", Circle(2,2,2))
+            SqlExpression("other__carea", "&&", Circle([2,2],2))
         )
         self.assertEqual(qs.count(), 2)
 
@@ -78,19 +78,19 @@ class GeometricSearches(TestCase):
 
     def test_strict_left_and_right_of(self):
         CircleObjectModel.objects.bulk_create([
-            CircleObjectModel(carea=Circle(-2,-2,1)),
-            CircleObjectModel(carea=Circle(0,5,1)),
-            CircleObjectModel(carea=Circle(10,0,1)),
+            CircleObjectModel(carea=Circle([-2,-2],1)),
+            CircleObjectModel(carea=Circle([0,5],1)),
+            CircleObjectModel(carea=Circle([10,0],1)),
         ])
 
         qs = CircleObjectModel.objects.where(
-            GeoExpression("carea").is_strictly_left_of(Circle(5,0,1))
+            GeoExpression("carea").is_strictly_left_of(Circle([5,0],1))
         )
 
         self.assertEqual(qs.count(), 2)
 
         qs = CircleObjectModel.objects.where(
-            GeoExpression("carea").is_strictly_right_of(Circle(0,0,1))
+            GeoExpression("carea").is_strictly_right_of(Circle([0,0],1))
         )
 
         self.assertEqual(qs.count(), 1)
@@ -101,18 +101,18 @@ class GeometricSearches(TestCase):
         # TODO: improve this test
 
         BoxObjectModel.objects.bulk_create([
-            BoxObjectModel(barea=Box(0,0,1,1)),
-            BoxObjectModel(barea=Box(0,0,1,1)),
+            BoxObjectModel(barea=Box([0,0],[1,1])),
+            BoxObjectModel(barea=Box([0,0],[1,1])),
         ])
 
         qs = BoxObjectModel.objects.where(
-            GeoExpression("barea").does_not_extend_right(Box(0,0,2,2))
+            GeoExpression("barea").does_not_extend_right(Box([0,0],[2,2]))
         )
 
         self.assertEqual(qs.count(), 2)
 
         qs = BoxObjectModel.objects.where(
-            GeoExpression("barea").does_not_extend_left(Box(0,0,2,2))
+            GeoExpression("barea").does_not_extend_left(Box([0,0],[2,2]))
         )
 
         self.assertEqual(qs.count(), 2)
@@ -172,24 +172,14 @@ class CircleTest(TestCase):
 class BoxTest(TestCase):
     def setUp(self):
         self.obj0 =  BoxObjectModel.objects\
-            .create(barea=Box(0,0,5,5))
+            .create(barea=Box([0,0],[5,5]))
 
     def tearDown(self):
         BoxObjectModel.objects.all().delete()
 
     def test_casting(self):
         self.assertIsInstance(self.obj0.barea, Box)
-        self.assertEqual(self.obj0.barea, Box(0,0,5,5))
+        self.assertEqual(self.obj0.barea, Box([0,0],[5,5]))
 
     def test_custom_instance(self):
-        self.assertEqual(Box(1,1,1,1), Box([1,1,1,1]))
-
-    def test_incorrect_constructor(self):
-        with self.assertRaises(ValueError):
-            x = Box([1,2,3,5,5])
-
-        with self.assertRaises(ValueError):
-            x = Box(1,2,3,2,5)
-
-        with self.assertRaises(ValueError):
-            x = Box(1,2,5)
+        self.assertEqual(Box([1,1],[1,1]), Box([1,1],[1,1]))

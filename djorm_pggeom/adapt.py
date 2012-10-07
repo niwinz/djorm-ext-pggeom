@@ -14,16 +14,16 @@ def adapt_circle(c):
 
 def adapt_lseg(l):
     return AsIs(u"'[(%s,%s), (%s,%s)]'::lseg" % (\
-        adapt(l.init_point.x),
-        adapt(l.init_point.y),
+        adapt(l.start_point.x),
+        adapt(l.start_point.y),
         adapt(l.end_point.x),
         adapt(l.end_point.y)
     ))
 
 def adapt_box(box):
     return AsIs("'(%s,%s),(%s,%s)'::box" % (
-        adapt(box.init_point.x),
-        adapt(box.init_point.y),
+        adapt(box.start_point.x),
+        adapt(box.start_point.y),
         adapt(box.end_point.x),
         adapt(box.end_point.y)
     ))
