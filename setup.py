@@ -6,7 +6,7 @@ PostgreSQL native geometric types and fields  extension for Django.
 
 setup(
     name = "djorm-ext-pggeom",
-    version = '0.4.0',
+    version = '0.4.1',
     url = 'https://github.com/niwibe/djorm-ext-pggeom',
     license = 'BSD',
     platforms = ['OS Independent'],
@@ -15,10 +15,10 @@ setup(
     author_email = 'niwi@niwi.be',
     maintainer = 'Andrey Antukh',
     maintainer_email = 'niwi@niwi.be',
-    packages = find_packages(),
-    include_package_data = False,
-    install_requires = [],
-    zip_safe = False,
+    install_requires = [
+        'djorm-ext-core >= 0.4',
+    ],
+    packages = ['djorm_pggeom'],
     classifiers = [
         'Development Status :: 4 - Beta',
         'Framework :: Django',

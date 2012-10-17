@@ -5,7 +5,7 @@ from django.utils.encoding import force_unicode
 
 class GeometricField(models.Field):
     __metaclass__ = models.SubfieldBase
-    
+
     def __init__(self, dbtype, *args, **kwargs):
         self._dbtype = dbtype
 
@@ -27,13 +27,6 @@ class GeometricField(models.Field):
 
 try:
     from south.modelsinspector import add_introspection_rules
-    from .objects import Point
-    add_introspection_rules([
-        (
-            [GeometricField], # class
-            [],               # positional params
-            {'dbtype': ["_dbtype", {"default": Point}]}, # kwargs
-        )
-    ], ['django_orm\.postgresql\.geometric\.fields\.GeometricField'])
+    add_introspection_rules(rules=[], patterns=['^djorm_pggeom.fields\.GeometricField$'])
 except ImportError:
     pass
